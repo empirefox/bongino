@@ -1,0 +1,99 @@
+{
+  "detail": "",
+  "showside": false,
+  "sections": [
+    {
+      "Swiper": {
+        "loop": true,
+        "autoplay": 3000,
+        "autoplayDisableOnInteraction": false,
+        "paging": true,
+        "arrows": true
+      },
+      "hfull": true,
+      "pattern": "Swiper",
+      "sideshow": false,
+      "panels": [
+        {
+          "body": "塑造高端企业形象",
+          "Mpanel": "primary",
+          "foot": "精准描述企业定位",
+          "head": "您的高端展示网站",
+          "img": "http://luck2me.qiniudn.com/201403-carousel1-1.png",
+          "pattern": "Mpanel",
+          "txtalign": "left"
+        },
+        {
+          "body": "分析、设计、开发、部署、维护",
+          "Mpanel": "primary",
+          "foot": "——我们将是您的专职部门",
+          "head": "复杂工作轻松完成",
+          "img": "http://luck2me.qiniudn.com/201403-carousel4-1.png",
+          "pattern": "Mpanel"
+        },
+        {
+          "body": "塑造高端企业形象",
+          "Mpanel": "primary",
+          "foot": "精准描述企业定位",
+          "head": "您的高端展示网站",
+          "img": "http://luck2me.qiniudn.com/201403-carousel1-1.png",
+          "pattern": "Mpanel",
+          "txtalign": "left"
+        },
+        {
+          "body": "分析、设计、开发、部署、维护",
+          "Mpanel": "primary",
+          "foot": "——我们将是您的专职部门",
+          "head": "复杂工作轻松完成",
+          "img": "http://luck2me.qiniudn.com/201403-carousel4-1.png",
+          "pattern": "Mpanel"
+        }
+      ]
+    },
+    {
+      "Masonry": {
+        "cols": 1
+      },
+      "hfull": true,
+      "pattern": "Plain",
+      "sideshow": false,
+      "bg": "bg-pattern:blueprintgrid",
+      "panels": [
+        {
+          "body": "[luck1](#p20000s2)\n\n[luck2](/page/20000#p20000s2)\n\n",
+          "Featurette": {
+            "imgcols": 5,
+            "imgtype": 0
+          },
+          "foot": "",
+          "head": "怎能没有网站",
+          "img": "http://luck2me.qiniudn.com/201403-no_site-1.png",
+          "pattern": "Featurette"
+        },
+        {
+          "body": "互联网时代，选择改变还是被取代？互联网改写传统行业的各类事件频发，随着互联网渗透到传统行业的速度不断加快，这种较量也会越来越多，我们最迫切需要做的就是：改变！",
+          "Featurette": {
+            "imgcols": 5,
+            "imgtype": 1,
+            "revert": true
+          },
+          "foot": "",
+          "head": "还没改变吗",
+          "img": "http://luck2me.qiniudn.com/201403-change-1.png",
+          "pattern": "Featurette"
+        },
+        {
+          "body": "准确找到并吸引目标群体",
+          "Featurette": {
+            "imgcols": 5,
+            "imgtype": 2
+          },
+          "foot": "",
+          "head": "您需要这样的网站",
+          "img": "http://luck2me.qiniudn.com/201403-site_need-1.png",
+          "pattern": "Featurette"
+        }
+      ]
+    }
+  ]
+}

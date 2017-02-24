@@ -7,7 +7,7 @@
     {
       "root": "src",
       "outDir": "dist",
-      "assets": ["public"],
+      "assets": ["public", "fixture", "profile"],
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
@@ -15,6 +15,7 @@
       "prefix": "app",
       "mobile": false,
       "styles": [
+        "../node_modules/ng2-tree/styles.css",
         "styles.less"
       ],
       "scripts": [
@@ -24,6 +25,7 @@
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
+        "ro": "environments/environment.ro.ts",
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
       }

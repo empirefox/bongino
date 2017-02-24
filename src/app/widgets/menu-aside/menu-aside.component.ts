@@ -1,7 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Location } from '@angular/common';
+import { NodeEvent } from 'ng2-tree';
 import { User } from '../../models/user';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { SiteService, Tree } from '../../core';
 
 @Component({
   selector: 'app-menu-aside',
@@ -11,10 +14,15 @@ import { UserService } from '../../services/user.service';
 export class MenuAsideComponent implements OnInit {
   private currentUrl: string;
   private currentUser: User = new User();
+  trees: Tree[];
 
   @Input() private links: Array<any> = [];
 
-  constructor(private userServ: UserService, public router: Router) {
+  constructor(
+    private location: Location,
+    private userServ: UserService,
+    public router: Router,
+    private siteService: SiteService) {
     // getting the current url
     this.router.events.subscribe((evt) => this.currentUrl = evt.url);
     this.userServ.currentUser.subscribe((user) => this.currentUser = user);
@@ -22,6 +30,27 @@ export class MenuAsideComponent implements OnInit {
 
   public ngOnInit() {
     // TODO
+    this.siteService.getTrees().subscribe(trees => this.trees = trees);
+  }
+
+  logEvent(e: NodeEvent) {
+    let node: Tree = <any>e.node.node;
+    console.log(node)
+    if (node.root) {
+      this.siteService.loadTree(node).subscribe(tree => {
+        let index = this.trees.findIndex(item => item.site.ID === tree.site.ID);
+        if (~index) {
+          this.trees[index] = tree;
+        }
+        this.siteService.jsf.next(tree);
+      });
+    } else {
+      this.siteService.jsf.next(node);
+    }
+    // TODO navigate to page
+    if (!this.location.isCurrentPathEqualTo('/p')) {
+      this.router.navigateByUrl('/p');
+    }
   }
 
 }

@@ -1,0 +1,1 @@
+export { WxCodeResult } from './wx';

@@ -1,0 +1,10 @@
+{
+  "src": [
+    "~/go/src/github.com/empirefox/bongine/front"
+  ],
+  "dist": "./src/app/core/api/consts.ts",
+  "defaultInlinePrettyTag": "zh",
+  "prettiesRoots": [
+    "./pretties"
+  ]
+}

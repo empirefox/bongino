@@ -1,0 +1,11 @@
+<json-schema-form
+  *ngIf="schema"
+  [options]="options"
+  [schema]="schema"
+  [layout]="layout"
+  [data]="data"
+  (onSubmit)="onSubmit($event)"
+  (isValid)="isValid($event)"
+  (validationErrors)="validationErrors($event)">
+</json-schema-form>
+<pre *ngIf="prettyValidationErrors" class="text-danger">{{prettyValidationErrors}}</pre>

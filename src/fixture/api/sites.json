@@ -1,0 +1,10 @@
+[
+  {
+    "ID": 1,
+    "Domain": "www.1.com",
+    "MainCdn": "/fixture/site1/",
+    "ProfileHash": "",
+    "Phone": "13333333333",
+    "Email": "luck2me@gmail.com"
+  }
+]

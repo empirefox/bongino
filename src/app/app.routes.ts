@@ -9,6 +9,7 @@ import { ClientComponent } from './pages/client/client.component';
 import { LayoutsAuthComponent } from './pages/layouts/auth/auth';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { PageComponent } from './pages/page/page.component';
 
 const routes: Routes = [
   // logged routes
@@ -29,6 +30,11 @@ const routes: Routes = [
         canActivate: [CanActivateGuard],
         component: ClientComponent,
         path: 'client'
+      },
+      {
+        canActivate: [CanActivateGuard],
+        component: PageComponent,
+        path: 'p'
       }
     ],
     component: LayoutsAuthComponent,

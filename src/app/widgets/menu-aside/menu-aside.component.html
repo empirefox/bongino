@@ -56,6 +56,7 @@
 				</ul></li>
 			</template> </template>
 		</ul>
+		<tree *ngFor="let tree of trees" [tree]="tree" (nodeSelected)="logEvent($event)"></tree>
 		<!-- /.sidebar-menu -->
 	</section>
 	<!-- /.sidebar -->
