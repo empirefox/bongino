@@ -36,7 +36,7 @@ export class PageComponent implements OnInit {
         this.hashData = tree.hash;
         this.data = tree.data;
         this.schema = tree.schema.schema;
-        this.layout = tree.schema.layout;
+        this.layout = tree.schema.form;
         this.options = {
           qiniuData: { siteid: tree.site.ID },
         };

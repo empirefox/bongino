@@ -52,9 +52,9 @@ export class SectionPatternTree implements Tree {
 
   set section(section: ISection) { this._section = section; }
 
-  get value() { return `Pattern ${this.section.pattern}`; }
-  get data() { return this.section[this.section.pattern]; }
-  get schema() { return sectionPatternSchemas[this.section.pattern]; }
+  get value() { return `Pattern ${this._section.pattern}`; }
+  get data() { return this._section[this._section.pattern]; }
+  get schema() { return sectionPatternSchemas[this._section.pattern]; }
 
 }
 
