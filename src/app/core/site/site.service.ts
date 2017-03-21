@@ -21,7 +21,7 @@ import {
 import { api } from '../config';
 import { Crud, CrudService } from '../crud';
 
-const {hash} = require('spark-md5');
+const { hash } = require('spark-md5');
 const sortKeys = require('sort-keys');
 
 export interface HashData {
@@ -34,7 +34,8 @@ export interface SiteData {
   pages: Dict<HashData>;
 }
 
-export interface Tree extends TreeModel {
+export interface Tree {
+  value: string;
   site: ISite;
   hash: HashData;
   data: any;
@@ -64,8 +65,6 @@ export class SiteService extends Crud<ISite> {
   jsf = new ReplaySubject<Tree>(1);
 
   private datas: Observable<Dict<SiteData>> = Observable.of({});
-  private trees: Observable<Dict<Tree[]>> = Observable.of({}); // all children cache
-  // private trees: Observable<Dict<TreeModel>> = Observable.of({});
 
   constructor(
     private rawHttp: Http,
@@ -114,105 +113,105 @@ export class SiteService extends Crud<ISite> {
     });
   }
 
-  getTrees(): Observable<Tree[]> {
-    return this.find().map(sites =>
-      (sites || []).map<Tree>(site => ({
+  getRoots(): Observable<Tree> {
+    return this.find().map(sites => {
+      let trees = (sites || []).map<Tree>(site => ({
         site,
         hash: { root: null, hash: null },
         value: site.Domain,
         data: site,
         schema: null,
         root: true,
-      }))
-    );
+        loadChildren: (callback) => this.loadChildren(site).subscribe(callback),
+      }));
+
+      return {
+        site: null,
+        hash: null,
+        value: 'Pages',
+        data: null,
+        schema: null,
+        children: trees,
+        settings: {
+          'static': true
+        },
+      } as Tree;
+    });
   }
 
-  // split site data
-  loadTree(tree: Tree): Observable<Tree> {
-    let site: ISite = tree.data;
-    if (tree.children) {
-      return Observable.of(tree);
-    }
-    return this.trees.mergeMap(trees => {
-      let children = trees[site.ID];
-      if (children) {
-        tree.children = children;
-        return Observable.of(tree);
-      }
-      return this.getData(site).map(data => {
-        let profileData = data.profileData;
-        let profile = <IProfile>profileData.root;
-        let nav = profile.nav;
-        let navitems = [nav.home, ...nav.items];
+  loadChildren(site: ISite): Observable<Tree[]> {
+    return this.getData(site).map(data => {
+      let profileData = data.profileData;
+      let profile = <IProfile>profileData.root;
+      let nav = profile.nav;
+      let navitems = [nav.home, ...nav.items];
 
-        let pagesTree: Tree[] = navitems.map(item => {
-          let pageData = data.pages[item.id];
-          let page = <IPage>pageData.root;
-          let sections = page.sections = page.sections || [];
-          let sectionsTree: Tree[] = sections.map(section => {
-            // [P1]
-            let panels = (section.panels || []).map(panel => ({
-              site,
-              hash: pageData,
-              value: panel.head || `Panel`,
-              data: panel,
-              schema: PanelSchema,
-            }));
-            return {
-              site,
-              hash: pageData,
-              value: section.title || `Section`,
-              data: section,
-              schema: SectionSchema,
-              children: [
-                new SectionPatternTree(site, pageData, section), // Pattern -> [Carousel|Masonry|Swiper]
-                ...panels,
-              ],
-            };
-          });
-          // [Home]
+      let pagesTree: Tree[] = navitems.map(item => {
+        let pageData = data.pages[item.id];
+        let page = <IPage>pageData.root;
+        let sections = page.sections = page.sections || [];
+        let sectionsTree: Tree[] = sections.map(section => {
+          // [P1]
+          let panels = (section.panels || []).map(panel => ({
+            site,
+            hash: pageData,
+            value: panel.head || `Panel`,
+            data: panel,
+            schema: PanelSchema,
+          }));
           return {
             site,
             hash: pageData,
-            value: item.name,
-            data: page,
-            schema: PageSchema,
-            children: [
-              {
-                site,
-                hash: profileData,
-                value: 'Nav',
-                data: item,
-                schema: NavItemSchema,
-              },
-              {
-                site,
-                hash: pageData,
-                value: 'Header',
-                data: page.header,
-                schema: HeaderSchema,
-              },
-              // [section] list
-              ...sectionsTree,
-            ],
+            value: section.title || `Section`,
+            data: section,
+            schema: SectionSchema,
+            loadChildren: (callback) => setTimeout(callback([
+              new SectionPatternTree(site, pageData, section), // Pattern -> [Carousel|Masonry|Swiper]
+              ...panels,
+            ]), 10),
           };
         });
-
-        tree = Object.assign({}, tree);
-        trees[site.ID] = tree.children = [
-          {
-            site,
-            hash: profileData, // null for site
-            value: 'Profile',
-            data: profile,
-            schema: ProfileSchema,
-          },
-          // [page] list
-          ...pagesTree,
-        ];
-
-        return tree;
+        // [Home]
+        return {
+          site,
+          hash: pageData,
+          value: item.name,
+          data: page,
+          schema: PageSchema,
+          loadChildren: (callback) => setTimeout(callback([
+            {
+              site,
+              hash: profileData,
+              value: 'Nav',
+              data: item,
+              schema: NavItemSchema,
+            },
+            {
+              site,
+              hash: pageData,
+              value: 'Header',
+              data: page.header,
+              schema: HeaderSchema,
+            },
+            // [section] list
+            ...sectionsTree,
+          ]), 10),
+        };
       });
+
+      let children = [
+        {
+          site,
+          hash: profileData, // null for site
+          value: 'Profile',
+          data: profile,
+          schema: ProfileSchema,
+        },
+        // [page] list
+        ...pagesTree,
+      ];
+
+      return children;
     });
   }
 
