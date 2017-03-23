@@ -9,7 +9,7 @@ import { AngularFireModule, FirebaseAppConfig } from 'angularfire2';
 import { ToasterModule } from 'angular2-toaster/angular2-toaster';
 import { environment } from '../environments/environment';
 import { TranslateModule, TranslateLoader, TranslateStaticLoader } from 'ng2-translate';
-import { TreeModule } from 'ng2-tree';
+import { TreeModule } from 'angular-tree-component';
 import { Observable } from 'rxjs/Observable';
 
 import { value as patterns } from 'ng2-ef-inputs/ng2-pattern-input/patterns';

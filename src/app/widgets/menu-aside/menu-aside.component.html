@@ -56,7 +56,7 @@
 				</ul></li>
 			</template> </template>
 		</ul>
-		<tree [tree]="pages" [settings]="ng2TreeSettings" (nodeSelected)="onNodeSelected($event)"></tree>
+		<tree-root [nodes]="sites" [options]="treeOptions" (onActivate)="onActivate($event)"></tree-root>
 		<!-- /.sidebar-menu -->
 	</section>
 	<!-- /.sidebar -->
