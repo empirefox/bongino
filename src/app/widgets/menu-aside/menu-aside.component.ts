@@ -1,26 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
-import { TreeNode, TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from 'angular-tree-component';
+import { TreeModel, TreeNode, TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from 'angular-tree-component';
 import { User } from '../../models/user';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { SiteService, Tree } from '../../core';
-
-const actionMapping: IActionMapping = {
-  mouse: {
-    dblClick: (tree, node, $event) => {
-      if (node.hasChildren) TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-    },
-  },
-  keys: {
-    // delete
-    46: (tree, node, $event) => {
-      let nodes: any[] = node.parent ? node.parent.data.children : tree.nodes;
-      nodes.splice(node.index, 1);
-      tree.update();
-    },
-  }
-};
+import { ModalService, SiteService, Tree, Level, newPanel, newSection, newPage } from '../../core';
 
 @Component({
   selector: 'app-menu-aside',
@@ -39,6 +23,7 @@ export class MenuAsideComponent implements OnInit {
     private location: Location,
     private userServ: UserService,
     public router: Router,
+    private modalService: ModalService,
     private siteService: SiteService) {
     // getting the current url
     this.router.events.subscribe((evt) => this.currentUrl = evt.url);
@@ -47,21 +32,96 @@ export class MenuAsideComponent implements OnInit {
 
   public ngOnInit() {
     this.treeOptions = {
-      displayField: 'value',
+      // displayField: 'value',
       // isExpandedField: 'expanded',
       idField: 'uuid',
       getChildren: this.siteService.getChildren.bind(this.siteService),
-      actionMapping,
+      actionMapping: {
+        mouse: {
+          dblClick: (tree, node, $event) => {
+            if (node.hasChildren) TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+          },
+          drop: (tree: TreeModel, node: TreeNode, $event: any, { from, to }) => {
+            // use from to get the dragged node.
+            // use to.parent and to.index to get the drop location
+            // use TREE_ACTIONS.MOVE_NODE to invoke the original action
+            let children: Tree[] = to.parent.data.children || [];
+            let firstIndex = children.findIndex(item => item.level !== Level.x);
+            if (~firstIndex && to.index < firstIndex) {
+              to.index = firstIndex;
+            } else if (!~firstIndex && to.index < children.length) {
+              to.index = children.length;
+            }
+            TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
+          },
+        },
+        keys: {
+          36: (tree, node, $event) => {
+            console.log(tree, node, $event)
+          },
+          // delete
+          46: (tree, node, $event) => {
+            let nodes: any[] = node.parent ? node.parent.data.children : tree.nodes;
+            nodes.splice(node.index, 1);
+            tree.update();
+          },
+          // insert after
+          45: (tree, node, $event) => {
+            if (!node.isRoot) {
+              // add page/section/panel
+              let data: Tree = node.data;
+              let nodes: Tree[] = node.parent.data.children;
+              switch (data.level) {
+                case Level.panel:
+                  nodes.push(newPanel(data.site));
+                  break;
+                case Level.section:
+                  nodes.push(newSection(data.site));
+                  break;
+                case Level.page:
+                  nodes.push(newPage(data.site, data.profile));
+                  break;
+                default:
+                  console.log('Cannot insert node with level:', data.level);
+              }
+              console.log(data)
+            } else {
+              // add site
+              let nodes: Tree[] = tree.nodes;
+              this.modalService.confirm('Save all modifies to server?', 'Danger!').then(resultPromise => {
+                return resultPromise.result.then(result => {
+                  this.siteService.saveSites().mergeMap(_ => {
+                    return this.siteService.save({
+                      ID: 0,
+                      MainCdn: '',
+                      ProfileHash: '',
+                      // user info
+                      Domain: result,
+                      Phone: '13312345678',
+                      Email: 'a@a.com',
+                    });
+                  }).subscribe(site => console.log(site));
+                }, _ => console.log('Lost all modifies!'));
+              });
+            }
+            tree.update();
+          },
+        }
+      },
       nodeHeight: 23,
+      useVirtualScroll: true,
       allowDrag: true,
-      useVirtualScroll: true
+      allowDrop: (element, to) => {
+        let parent: Tree = to.parent.data;
+        let node: Tree = element.data;
+        return parent.drop === node.level && parent.site === node.site;
+      },
     };
     // TODO
     this.siteService.getRoots().subscribe(sites => this.sites = sites);
   }
 
   onActivate(e: any) {
-    console.log(e.node)
     let node: Tree = <any>e.node.data;
     this.siteService.jsf.next(node);
     // TODO navigate to page

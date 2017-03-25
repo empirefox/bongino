@@ -12,4 +12,12 @@ export class ModalService {
       .title(title)
       .body(content).open();
   }
+
+  confirm(content: string, title: string) {
+    return this.modal.confirm()
+      .size('lg')
+      .showClose(true)
+      .title(title)
+      .body(content).open();
+  }
 }

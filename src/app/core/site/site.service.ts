@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { extendObservable } from 'mobx';
 import { TreeNode } from 'angular-tree-component';
 import {
   ISite, SiteMethods,
   IProfile, defaultProfile,
   INav, INavItem,
   IPage,
-  ISection, sectionPattern,
 } from 'bongin-base';
 import {
   ProfileSchema,
@@ -20,59 +20,12 @@ import {
 
 import { api } from '../config';
 import { Crud, CrudService } from '../crud';
-
-const { hash } = require('spark-md5');
-const sortKeys = require('sort-keys');
-
-export interface HashData {
-  root: IPage | IProfile;
-  hash: string;
-}
-
-export interface SiteData {
-  profileData: HashData;
-  pages: Dict<HashData>;
-}
-
-export interface Tree {
-  value: string;
-  site: ISite;
-  hash: HashData;
-  data: any;
-  schema: any;
-  hasChildren?: boolean;
-  children?: Tree[];
-  level: Level;
-
-  nav?: INavItem; // for load page
-  profileData?: HashData;// for load page
-}
-
-export class SectionPatternTree implements Tree {
-  level = Level.x;
-  hasChildren = false;
-  private _section: ISection;
-
-  constructor(public site: ISite, public hash: HashData, section: ISection) {
-    this.section = section;
-  }
-
-  set section(section: ISection) { this._section = section; }
-
-  get value() { return `Pattern ${this._section.pattern}`; }
-  get data() { return this._section[this._section.pattern]; }
-  get schema() { return sectionPatternSchemas[this._section.pattern]; }
-
-}
-
-export enum Level { x, site, page, section, panel };
+import { md5, Level, Tree, SectionPatternTree } from './structs';
 
 @Injectable()
 export class SiteService extends Crud<ISite> {
 
   jsf = new ReplaySubject<Tree>(1);
-
-  private datas: Observable<Dict<SiteData>> = Observable.of({});
 
   constructor(
     private rawHttp: Http,
@@ -88,32 +41,35 @@ export class SiteService extends Crud<ISite> {
 
   getRoots(): Observable<Tree[]> {
     return this.find().map(sites =>
-      (sites || []).map<Tree>(site => ({
-        site,
-        hash: { root: null, hash: null },
-        value: site.Domain,
-        data: site,
-        schema: null,
-        level: Level.site,
-        hasChildren: true,
-      }))
+      (sites || []).map<Tree>(site => extendObservable(
+        {
+          site,
+          profile: null,
+          schema: null,
+          level: Level.site,
+          drop: Level.page,
+          hasChildren: true,
+        }, {
+          data: site,
+          get name() { return this.data.Domain; },
+        },
+      ))
     );
   }
 
   getChildren(node: TreeNode) {
     let data: Tree = node.data;
     let site: ISite = data.site;
-    switch (data.level) {
-      case Level.site:
-        return this.loadSite(site);
-      case Level.page:
-        return this.loadPage(site, data);
-      default:
-        throw new Error(`level not supported: ${data.level}`);
+    if (node.isRoot) {
+      return this.loadSite(data, site);
+    } else if (data.level === Level.page) {
+      return this.loadPage(site, data);
+    } else {
+      throw new Error(`level not supported: ${data.level}`);
     }
   }
 
-  loadSite(site: ISite) {
+  loadSite(root: Tree, site: ISite) {
     let sm = new SiteMethods(site);
     return this.rawHttp.get(sm.profile()).map(res => res.json()).catch((err, caught) => {
       return caught.map(res => {
@@ -124,100 +80,116 @@ export class SiteService extends Crud<ISite> {
         return defaultProfile(site);
       });
     }).map(profile => {
+      root.profile = profile;
       // init nav
       let nav = profile.nav = profile.nav || <INav>{};
       // init home
-      nav.home = nav.home || <INavItem>{ id: 1, name: 'Home' };
+      nav.home = nav.home || <INavItem>{ id: 0, name: 'Home' };
       nav.items = nav.items || [];
 
-      let profileData = { root: profile, hash: this.hash(profile) };
-
-      let pagesTree: Tree[] = [nav.home, ...nav.items].map(item => ({
-        site,
-        hash: null, // TODO
-        value: item.name,
-        data: null, // TODO
-        schema: PageSchema,
-        level: Level.page,
-        hasChildren: true,
-        nav: item,
-        profileData,
-      }));
+      // [Home]
+      let pageTrees: Tree[] = [nav.home, ...nav.items].map(item => extendObservable(
+        {
+          site,
+          profile,
+          data: null, // TODO
+          schema: PageSchema,
+          level: Level.page,
+          drop: Level.section,
+          hasChildren: true,
+        }, {
+          nav: item,
+          get name() { return this.nav.name; },
+        },
+      ));
 
       return <Tree[]>[
         {
           site,
-          hash: profileData, // null for site
-          value: 'Profile',
+          name: 'Profile',
           data: profile,
           schema: ProfileSchema,
           level: Level.x,
+          drop: Level.x,
           hasChildren: false,
         },
         // [page] list
-        ...pagesTree,
+        ...pageTrees,
       ];
     }).toPromise();
   }
 
-  loadPage(site: ISite, tree: Tree) {
+  loadPage(site: ISite, pageTree: Tree) {
     let sm = new SiteMethods(site);
-    return this.rawHttp.get(sm.page(tree.nav)).map(res => {
+    return this.rawHttp.get(sm.page(pageTree.nav)).map(res => {
       let page: IPage = res.json();
-      let pageData = tree.data = { root: page, hash: this.hash(page) };
 
       let sections = page.sections = page.sections || [];
-      let sectionsTree: Tree[] = sections.map(section => {
-        // [P1]
-        let panels = (section.panels || []).map(panel => ({
-          site,
-          hash: pageData,
-          value: panel.head || `Panel`,
-          data: panel,
-          schema: PanelSchema,
-          level: Level.panel,
-          hasChildren: false,
-        }));
-        return {
-          site,
-          hash: pageData,
-          value: section.title || `Section`,
-          data: section,
-          schema: SectionSchema,
-          children: [
-            new SectionPatternTree(site, pageData, section), // Pattern -> [Carousel|Masonry|Swiper]
-            ...panels,
-          ],
-          level: Level.section,
-        };
+      let sectionTrees: Tree[] = sections.map(section => {
+        // [P1] -> panel
+        let panels = (section.panels || []).map(panel => extendObservable(
+          {
+            site,
+            schema: PanelSchema,
+            level: Level.panel,
+            drop: Level.x,
+            hasChildren: false,
+          }, {
+            data: panel,
+            get name() { return this.data.head || `Panel`; },
+          },
+        ));
+
+        // [S1] -> section
+        return extendObservable(
+          {
+            site,
+            schema: SectionSchema,
+            level: Level.section,
+            drop: Level.panel,
+            children: [
+              // Pattern -> [Carousel|Masonry|Swiper]
+              new SectionPatternTree(site, section),
+              ...panels,
+            ],
+          }, {
+            data: section,
+            get name() {
+              this.children[0].section = this.data;
+              return this.data.title || `Section`;
+            },
+          },
+        );
       });
       return <Tree[]>[
         {
           site,
-          hash: tree.profileData,
-          value: 'Nav',
-          data: tree.nav,
+          profile: pageTree.profile,
+          name: 'Nav',
+          data: pageTree.nav,
           schema: NavItemSchema,
           level: Level.x,
+          drop: Level.x,
           hasChildren: false,
         },
         {
           site,
-          hash: pageData,
-          value: 'Header',
-          data: page.header,
+          name: 'Header',
+          data: page.header || {},
           schema: HeaderSchema,
           level: Level.x,
+          drop: Level.x,
           hasChildren: false,
         },
         // [section] list
-        ...sectionsTree,
+        ...sectionTrees,
       ];
     }).toPromise();
   }
 
-  hash(page: IPage | IProfile): string {
-    return hash(JSON.stringify(sortKeys(page, { deep: true }))).slice(0, 7);
+  // TODO
+  saveSites(): Observable<any> {
+    return Observable.of(null);
   }
 
 }

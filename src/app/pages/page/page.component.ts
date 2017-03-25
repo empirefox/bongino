@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { isObject } from 'lodash';
-import { SiteService, Tree, HashData } from '../../core';
+import { SiteService, Tree, md5 } from '../../core';
 
 @Component({
   selector: 'app-page',
@@ -8,10 +8,9 @@ import { SiteService, Tree, HashData } from '../../core';
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements OnInit {
-  hashData: HashData;
+  tree: Tree;
   schema: any;
   layout: any;
-  data: any;
   options: any;
   formIsValid: boolean;
 
@@ -33,8 +32,7 @@ export class PageComponent implements OnInit {
     this.siteService.jsf.forEach(tree => {
       if (tree && tree.schema) {
         console.log(tree.schema)
-        this.hashData = tree.hash;
-        this.data = tree.data;
+        this.tree = tree;
         this.schema = tree.schema.schema;
         this.layout = tree.schema.form;
         this.options = {
@@ -45,15 +43,8 @@ export class PageComponent implements OnInit {
   }
 
   onSubmit(data: any) {
-    for (let key in this.data) {
-      if (this.data.hasOwnProperty(key) && !isObject(this.data[key])) {
-        delete this.data[key];
-      }
-    }
-    Object.assign(this.data, data);
-    let old = this.hashData.hash;
-    this.hashData.hash = this.siteService.hash(this.hashData.root);
-    console.log(old, '=>', this.data)
+    this.tree.data = data;
+    console.log(this.tree.data)
   }
 
   isValid(isValid: boolean) {
