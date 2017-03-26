@@ -4,7 +4,13 @@ import { TreeModel, TreeNode, TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions }
 import { User } from '../../models/user';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { ModalService, SiteService, Tree, Level, newPanel, newSection, newPage } from '../../core';
+import {
+  ModalService,
+  SiteService,
+  PageTree, SectionTree, PanelTree, SiteTree,
+  Tree, Level,
+  newPanel, newSection, newPage,
+} from '../../core';
 
 @Component({
   selector: 'app-menu-aside',
@@ -56,12 +62,34 @@ export class MenuAsideComponent implements OnInit {
           },
         },
         keys: {
-          36: (tree, node, $event) => {
+          // home for test
+          36: (tree: TreeModel, node, $event) => {
             console.log(tree, node, $event)
+            console.log(tree.nodes[0].children[2])
           },
           // delete
           46: (tree, node, $event) => {
             let nodes: any[] = node.parent ? node.parent.data.children : tree.nodes;
+            switch (node.data.level) {
+              case Level.page:
+              case Level.section:
+                if (nodes.length === 3) {
+                  return;
+                }
+                break;
+              case Level.panel:
+                if (nodes.length === 2) {
+                  return;
+                }
+                break;
+              case Level.site:
+                if (nodes.length === 1) {
+                  return;
+                }
+                break;
+              default:
+                return;
+            }
             nodes.splice(node.index, 1);
             tree.update();
           },
@@ -73,18 +101,20 @@ export class MenuAsideComponent implements OnInit {
               let nodes: Tree[] = node.parent.data.children;
               switch (data.level) {
                 case Level.panel:
-                  nodes.push(newPanel(data.site));
+                  let panelTree = <PanelTree>data;
+                  nodes.push(newPanel(panelTree.siteTree));
                   break;
                 case Level.section:
-                  nodes.push(newSection(data.site));
+                  let sectionTree = <SectionTree>data;
+                  nodes.push(newSection(sectionTree.siteTree));
                   break;
                 case Level.page:
-                  nodes.push(newPage(data.site, data.profile));
+                  let pageTree = <PageTree>data;
+                  nodes.push(newPage(pageTree.siteTree));
                   break;
                 default:
                   console.log('Cannot insert node with level:', data.level);
               }
-              console.log(data)
             } else {
               // add site
               let nodes: Tree[] = tree.nodes;
@@ -114,7 +144,7 @@ export class MenuAsideComponent implements OnInit {
       allowDrop: (element, to) => {
         let parent: Tree = to.parent.data;
         let node: Tree = element.data;
-        return parent.drop === node.level && parent.site === node.site;
+        return parent.drop === node.level && node.site && parent.site === node.site;
       },
     };
     // TODO
@@ -122,8 +152,7 @@ export class MenuAsideComponent implements OnInit {
   }
 
   onActivate(e: any) {
-    let node: Tree = <any>e.node.data;
-    this.siteService.jsf.next(node);
+    this.siteService.jsf.next(e.node);
     // TODO navigate to page
     if (!this.location.isCurrentPathEqualTo('/p')) {
       this.router.navigateByUrl('/p');

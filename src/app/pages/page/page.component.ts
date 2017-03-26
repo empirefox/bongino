@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { isObject } from 'lodash';
-import { SiteService, Tree, md5 } from '../../core';
+import { TreeNode } from 'angular-tree-component';
+import { computeProfile, computePage, md5, SiteService, Tree, Level, SiteTree, PageTree } from '../../core';
 
 @Component({
   selector: 'app-page',
@@ -8,6 +9,7 @@ import { SiteService, Tree, md5 } from '../../core';
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements OnInit {
+  node: TreeNode;
   tree: Tree;
   schema: any;
   layout: any;
@@ -15,6 +17,7 @@ export class PageComponent implements OnInit {
   formIsValid: boolean;
 
   private formValidationErrors: any;
+  private sub: any;
 
   constructor(private siteService: SiteService) { }
 
@@ -29,9 +32,10 @@ export class PageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.siteService.jsf.forEach(tree => {
+    this.sub = this.siteService.jsf.subscribe((node: TreeNode) => {
+      this.node = node;
+      let tree: Tree = node.data;
       if (tree && tree.schema) {
-        console.log(tree.schema)
         this.tree = tree;
         this.schema = tree.schema.schema;
         this.layout = tree.schema.form;
@@ -42,8 +46,44 @@ export class PageComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
+
   onSubmit(data: any) {
+    // if (this.tree.level === Level.site) {
+    //   for (let key in this.tree.data) {
+    //     if (this.tree.data.hasOwnProperty(key)) {
+    //       delete this.tree.data[key];
+    //     }
+    //   }
+    //   Object.assign(this.tree.data, data);
+    // } else {
+    //   this.tree.data = data;
+    // }
     this.tree.data = data;
+    let level = this.tree.level;
+    if (level === Level.profile || level === Level.nav || level === Level.navitem) {
+      // find profile to hash
+      let node = this.node;
+      while (!node.isRoot) {
+        node = node.parent;
+      }
+      let tree: SiteTree = node.data;
+      tree.current = computeProfile(tree);
+      tree.rehash = md5(tree.current);
+      console.log('current profile', tree.current);
+    } else if (level !== Level.x && level !== Level.site && !this.node.isRoot) {
+      // find page to hash
+      let node = this.node;
+      while (node.data.level !== Level.page) {
+        node = node.parent;
+      }
+      let tree: PageTree = node.data;
+      tree.current = computePage(tree);
+      tree.rehash = md5(tree.current);
+      console.log('current page', tree.current);
+    }
     console.log(this.tree.data)
   }
 

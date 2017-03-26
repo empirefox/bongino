@@ -56,7 +56,12 @@
 				</ul></li>
 			</template> </template>
 		</ul>
-		<tree-root [nodes]="sites" [options]="treeOptions" (onActivate)="onActivate($event)"></tree-root>
+		<tree-root [nodes]="sites" [options]="treeOptions" (onActivate)="onActivate($event)">
+			<template #treeNodeTemplate let-node="node" let-index="index">
+				<i *ngIf="node.data.fa" class="fa fa-fw fa-{{node.data.fa}}"></i>
+				<span [class.unsaved]="node.data.dirty||node.data.hash!==node.data.rehash">{{ node.data.name }}</span>
+			</template>
+		</tree-root>
 		<!-- /.sidebar-menu -->
 	</section>
 	<!-- /.sidebar -->
