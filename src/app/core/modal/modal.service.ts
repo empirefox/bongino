@@ -20,4 +20,13 @@ export class ModalService {
       .title(title)
       .body(content).open();
   }
+
+  prompt(content: string, title: string, placeholder = '') {
+    return this.modal.prompt()
+      .size('lg')
+      .showClose(true)
+      .placeholder(placeholder)
+      .title(title)
+      .body(content).open();
+  }
 }

@@ -56,10 +56,16 @@
 				</ul></li>
 			</template> </template>
 		</ul>
+		<div class="btn-group" role="group">
+			<button (click)="onSaveAll()" type="button" class="btn btn-primary"><i class="fa fa-check"></i></button>
+			<button (click)="onCancelAll()" type="button" class="btn btn-danger"><i class="fa fa-rotate-left"></i></button>
+			<button (click)="onAddSite()" type="button" class="btn btn-success"><i class="fa fa-close"></i></button>
+		</div>
 		<tree-root [nodes]="sites" [options]="treeOptions" (onActivate)="onActivate($event)">
 			<template #treeNodeTemplate let-node="node" let-index="index">
 				<i *ngIf="node.data.fa" class="fa fa-fw fa-{{node.data.fa}}"></i>
 				<span [class.unsaved]="node.data.dirty||node.data.hash!==node.data.rehash">{{ node.data.name }}</span>
+				<button *ngIf="node.data.deleted" (click)="node.data.deleted=false"><i class="fa fa-rotate-left"></i></button>
 			</template>
 		</tree-root>
 		<!-- /.sidebar-menu -->

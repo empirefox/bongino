@@ -1,23 +1,61 @@
-import { extendObservable } from 'mobx';
+import { omitBy, isNil } from 'lodash-es';
 import { TreeNode } from 'angular-tree-component';
-import * as _ from 'lodash';
-import { ISite, IProfile, INav, INavItem, IPage, IHeader, ISection, IPanel } from 'bongin-base';
+import { IProfile, INav, IPage, IHeader, ISection, IPanel } from 'bongin-base';
 
-import { Level, Tree, SiteTree, PageTree, HeaderTree, SectionTree, PanelTree } from './models';
+import { md5, Level, SiteTree, PageTree, SectionTree, PanelTree } from './models';
+
+export function computeFromNodeMove(node: TreeNode) {
+  if (node.data.level === Level.page) {
+    // update nav
+    computeProfileFromNode(node);
+  } else if (~[Level.section, Level.panel].indexOf(node.data.level)) {
+    // update page content
+    computePageFromNode(node);
+  }
+}
+
+export function computeProfileFromNode(node: TreeNode): IProfile {
+  while (!node.isRoot) {
+    node = node.parent;
+  }
+  let tree: SiteTree = node.data;
+  return computeProfile(tree);
+}
 
 export function computeProfile(siteTree: SiteTree): IProfile {
-  let items = siteTree.children.slice(2).map((pageTree: PageTree) => pageTree.nav);
-  let profile = _.omitBy<IProfile, IProfile>(siteTree.profile, _.isNil);
-  profile.nav = _.omitBy<INav, INav>(siteTree.nav, _.isNil);
+  let items = siteTree.children.slice(2).filter((pageTree: PageTree) => !pageTree.deleted).map((pageTree: PageTree, i) => {
+    let nav = pageTree.nav;
+    nav.id = i;
+    nav.hash = pageTree.rehash || pageTree.hash || nav.hash;
+    if (!nav.hash) {
+      computePage(pageTree);
+      nav.hash = pageTree.rehash;
+    }
+    return nav;
+  });
+  let profile = omitBy<IProfile, IProfile>(siteTree.profile, isNil);
+  profile.nav = omitBy<INav, INav>(siteTree.nav, isNil);
   profile.nav.home = items[0];
   profile.nav.items = items.slice(1);
-  return profile;
+  siteTree.rehash = md5(profile);
+  return siteTree.current = profile;
+}
+
+export function computePageFromNode(node: TreeNode): IPage {
+  if (node.isRoot) {
+    throw new Error('can not compute page for Site Node');
+  }
+  while (node.data.level !== Level.page) {
+    node = node.parent;
+  }
+  let tree: PageTree = node.data;
+  return computePage(tree);
 }
 
 export function computePage(pageTree: PageTree): IPage {
-  let sections = pageTree.children.slice(2).map((sectionTree: SectionTree) => {
+  let sections = pageTree.children.slice(2).filter((pageTree: PageTree) => !pageTree.deleted).map((sectionTree: SectionTree) => {
     let panels = sectionTree.children.slice(1).map(
-      (panelTree: PanelTree) => <IPanel>_.omitBy(panelTree.data, _.isNil)
+      (panelTree: PanelTree) => <IPanel>omitBy(panelTree.data, isNil)
     );
 
     let sectionData = sectionTree.data || <ISection>{};
@@ -29,10 +67,10 @@ export function computePage(pageTree: PageTree): IPage {
       hfull: sectionData.hfull,
       sideshow: sectionData.sideshow,
       pattern: sectionData.pattern,
-      [sectionData.pattern]: _.omitBy(sectionData[sectionData.pattern], _.isNil),
+      [sectionData.pattern]: omitBy(sectionData[sectionData.pattern], isNil),
       panels,
     };
-    return _.omitBy<ISection, ISection>(section, _.isNil);
+    return omitBy<ISection, ISection>(section, isNil);
   });
 
   let pageData = pageTree.data;
@@ -50,9 +88,11 @@ export function computePage(pageTree: PageTree): IPage {
     detail: pageData.detail,
     showside: pageData.showside,
     bg: pageData.bg,
-    header: _.omitBy(header, _.isNil),
+    header: omitBy(header, isNil),
     sections,
   };
 
-  return _.omitBy<IPage, IPage>(page, _.isNil);
+  pageTree.current = omitBy<IPage, IPage>(page, isNil);
+  pageTree.rehash = md5(pageTree.current);
+  return pageTree.current;
 }

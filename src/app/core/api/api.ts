@@ -54,6 +54,7 @@ export function apis(apiOrigin: string, ext?: string) {
         // GetQiniuList only delete with key. It will check site's owner.
         // name = base64('s/:siteid/2017/01/abc.png')
         DeleteQiniu: (key: any) => `${apiOrigin}/qiniu/${key}${ext}`,
+        PostBatchDeleteQiniu: `${apiOrigin}/qiniu/batch${ext}`,
 
         PostAuthWx: `${apiOrigin}/auth/wx${ext}`,  // weixin only
 

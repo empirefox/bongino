@@ -6,7 +6,14 @@ import {
   ISection,
   IPanel,
 } from 'bongin-base';
-import { Tree, SiteTree, PageTree, NavitemTree, HeaderTree, SectionTree, SectionPatternTree, PanelTree } from './models';
+import {
+  md5, Tree,
+  SiteTree, NavTree, ProfileTree,
+  PageTree, NavitemTree, HeaderTree,
+  SectionTree, SectionPatternTree,
+  PanelTree,
+} from './models';
+import { computePage } from './compute';
 
 export function newPanel(siteTree: SiteTree): Tree {
   let panel = <IPanel>{
@@ -41,6 +48,36 @@ export function newPage(siteTree: SiteTree): Tree {
     new HeaderTree(pageTree, null),
     newSection(siteTree),
   ];
+  computePage(pageTree);
 
   return pageTree;
+}
+
+export function newSite(): SiteTree {
+  let root = new SiteTree({
+    ID: 0,
+    MainCdn: '',
+    ProfileHash: '',
+    // from user jwt
+    Phone: '',
+    Email: '',
+    // user info
+    Domain: '',
+  });
+
+  root.dirty = true;
+  root.profile = defaultProfile(root.data);
+  root.nav = <INav>{};
+
+  // [Home]
+  let pageTree = <PageTree>newPage(root);
+  pageTree.nav.name = 'Home';
+
+  root.children = [
+    new NavTree(root),
+    new ProfileTree(root),
+    pageTree,
+  ];
+
+  return root;
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { isObject } from 'lodash';
 import { TreeNode } from 'angular-tree-component';
-import { computeProfile, computePage, md5, SiteService, Tree, Level, SiteTree, PageTree } from '../../core';
+import { computeProfileFromNode, computePageFromNode, md5, SiteService, Tree, Level, SiteTree, PageTree } from '../../core';
 
 @Component({
   selector: 'app-page',
@@ -65,24 +64,12 @@ export class PageComponent implements OnInit {
     let level = this.tree.level;
     if (level === Level.profile || level === Level.nav || level === Level.navitem) {
       // find profile to hash
-      let node = this.node;
-      while (!node.isRoot) {
-        node = node.parent;
-      }
-      let tree: SiteTree = node.data;
-      tree.current = computeProfile(tree);
-      tree.rehash = md5(tree.current);
-      console.log('current profile', tree.current);
+      let profile = computeProfileFromNode(this.node);
+      console.log('current profile', profile);
     } else if (level !== Level.x && level !== Level.site && !this.node.isRoot) {
       // find page to hash
-      let node = this.node;
-      while (node.data.level !== Level.page) {
-        node = node.parent;
-      }
-      let tree: PageTree = node.data;
-      tree.current = computePage(tree);
-      tree.rehash = md5(tree.current);
-      console.log('current page', tree.current);
+      let page = computePageFromNode(this.node);
+      console.log('current page', page);
     }
     console.log(this.tree.data)
   }

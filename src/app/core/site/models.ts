@@ -43,8 +43,10 @@ export class SiteTree implements Tree {
   hash: string = null; // profile hash
   rehash: string = null;
   current: IProfile;
+  // navhashes: string[];
   nav: INav;
   dirty: boolean; // for ISite
+  deleted: boolean;
 
   private _data: ISite;
 
@@ -60,6 +62,10 @@ export class SiteTree implements Tree {
     this.dirty = true;
     this._data = data;
   }
+
+  key() { return this.hash ? `s/${this.site.ID}/f/${this.hash}` : ''; }
+
+  rekey() { return this.rehash ? `s/${this.site.ID}/f/${this.rehash}` : ''; }
 }
 
 export class ProfileTree implements Tree {
@@ -106,11 +112,16 @@ export class PageTree implements Tree {
   hash: string = null;
   rehash: string = null;
   current: IPage;
+  deleted: boolean;
 
   constructor(public siteTree: SiteTree, public nav: INavItem) { }
 
   get name() { return this.nav.name; }
   get site() { return this.siteTree.site; }
+
+  key() { return this.hash ? `s/${this.site.ID}/f/${this.hash}` : ''; }
+
+  rekey() { return this.rehash ? `s/${this.site.ID}/f/${this.rehash}` : ''; }
 }
 
 export class NavitemTree implements Tree {
@@ -183,8 +194,8 @@ export class PanelTree implements Tree {
   get site() { return this.siteTree.site; }
 }
 
-export function md5(page: IPage | IProfile): string {
-  return hash(stringify(page)).slice(0, 7);
+export function md5(obj: any): string {
+  return hash(stringify(obj)).slice(0, 7);
 }
 
 export function stringify(obj: any): string {
