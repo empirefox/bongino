@@ -39,7 +39,7 @@ export function newSection(siteTree: SiteTree): Tree {
 
 export function newPage(siteTree: SiteTree): Tree {
   let page = <IPage>{ showside: true };
-  let nav = <INavItem>{ id: 0, name: 'New Page' }; // TODO set id
+  let nav = <INavItem>{ name: 'New Page' };
 
   let pageTree = new PageTree(siteTree, nav);
   pageTree.data = page;
@@ -57,6 +57,7 @@ export function newSite(): SiteTree {
   let root = new SiteTree({
     ID: 0,
     MainCdn: '',
+    MainCdns: '',
     ProfileHash: '',
     // from user jwt
     Phone: '',

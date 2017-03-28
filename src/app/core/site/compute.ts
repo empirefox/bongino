@@ -23,9 +23,8 @@ export function computeProfileFromNode(node: TreeNode): IProfile {
 }
 
 export function computeProfile(siteTree: SiteTree): IProfile {
-  let items = siteTree.children.slice(2).filter((pageTree: PageTree) => !pageTree.deleted).map((pageTree: PageTree, i) => {
+  let items = siteTree.children.slice(2).filter((pageTree: PageTree) => !pageTree.deleted).map((pageTree: PageTree) => {
     let nav = pageTree.nav;
-    nav.id = i;
     nav.hash = pageTree.rehash || pageTree.hash || nav.hash;
     if (!nav.hash) {
       computePage(pageTree);

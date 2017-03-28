@@ -7,8 +7,9 @@ import {
 
 import { md5, Level, Tree, SiteTree, PageTree, NavitemTree, HeaderTree, SectionTree, SectionPatternTree, PanelTree } from './models';
 
-export function parsePageChildren(pageTree: PageTree, page: IPage): Tree[] {
-  pageTree.hash = pageTree.rehash = md5(page);
+export function parsePageChildren(pageTree: PageTree, page: IPage, nav: INavItem): Tree[] {
+  pageTree.hash = nav.hash;
+  pageTree.rehash = md5(page);
   pageTree.data = page;
 
   let sections = page.sections = page.sections || [];

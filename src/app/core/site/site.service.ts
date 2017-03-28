@@ -75,20 +75,20 @@ export class SiteService extends Crud<ISite> {
         return defaultProfile(root.data);
       });
     }).map(profile => {
-      root.hash = root.rehash = md5(profile);
+      root.hash = root.site.ProfileHash;
+      root.rehash = md5(profile);
       root.profile = profile;
       // init nav
       let nav = root.nav = profile.nav = profile.nav || <INav>{};
       // init home
-      nav.home = nav.home || <INavItem>{ id: null, name: 'Home' }; // TODO load example page when id===0
+      nav.home = nav.home || <INavItem>{ name: 'Home' };
       nav.items = nav.items || [];
 
       let navitems = [nav.home, ...nav.items];
-      // root.navhashes = navitems.map(item => item.hash);
 
       // [Home]
       let pageTrees: Tree[] = navitems.map(item => new PageTree(root, item));
-      if (nav.home.id === null) {
+      if (!nav.home.hash) {
         let pageTree = pageTrees[0] = <PageTree>newPage(root);
         pageTree.nav.name = 'Home';
       }
@@ -104,7 +104,7 @@ export class SiteService extends Crud<ISite> {
 
   loadPage(pageTree: PageTree): Promise<Tree[]> {
     let sm = new SiteMethods(pageTree.siteTree.data);
-    return this.rawHttp.get(sm.page(pageTree.nav)).map(res => parsePageChildren(pageTree, res.json())).toPromise();
+    return this.rawHttp.get(sm.page(pageTree.nav)).map(res => parsePageChildren(pageTree, res.json(), pageTree.nav)).toPromise();
   }
 
   // Actions start

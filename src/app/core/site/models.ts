@@ -8,6 +8,7 @@ import {
   IPanel,
 } from 'bongin-base';
 import {
+  SiteSchema,
   ProfileSchema,
   NavSchema, NavItemSchema,
   HeaderSchema,
@@ -34,7 +35,7 @@ export interface Tree {
 
 export class SiteTree implements Tree {
   fa = 'globe';
-  schema: any = null;
+  schema: any = SiteSchema;
   level = Level.site;
   drop = Level.page;
   hasChildren = true;
@@ -43,7 +44,6 @@ export class SiteTree implements Tree {
   hash: string = null; // profile hash
   rehash: string = null;
   current: IProfile;
-  // navhashes: string[];
   nav: INav;
   dirty: boolean; // for ISite
   deleted: boolean;
