@@ -61,6 +61,7 @@
   "devDependencies": {
     "@types/countdown": "0.0.5",
     "@types/jasmine": "^2.2.30",
+    "@types/lodash-es": "^4.14.5",
     "@types/swiper": "^3.4.0",
     "codelyzer": "~0.0.26",
     "jasmine-core": "2.4.1",

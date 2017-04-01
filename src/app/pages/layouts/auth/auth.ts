@@ -84,6 +84,11 @@ export class LayoutsAuthComponent implements OnInit {
           },
         ],
       },
+      {
+        'title': 'Concact',
+        'icon': 'comments-o',
+        'link': ['/concact']
+      },
 
       {
         'title': 'Home',

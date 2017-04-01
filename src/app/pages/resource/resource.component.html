@@ -1,0 +1,19 @@
+<div class="container-fluid">
+  <div *ngIf="items&&siteMap" class="list-group col-md-4">
+    <a *ngFor="let item of items" (click)="active=item" class="list-group-item" [class.active]="active===item">
+      <span class="badge">{{siteMap[item.Mount]?.Domain}}</span> #{{item.ID}}
+    </a>
+  </div>
+  <div class="col-md-8">
+    <json-schema-form
+      *ngIf="active"
+      [schema]="schema"
+      [layout]="layout"
+      [data]="active"
+      (onSubmit)="onSubmit($event)"
+      (isValid)="isValid($event)"
+      (validationErrors)="validationErrors($event)">
+    </json-schema-form>
+    <pre *ngIf="prettyValidationErrors" class="text-danger">{{prettyValidationErrors}}</pre>
+  </div>
+</div>

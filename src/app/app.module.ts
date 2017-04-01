@@ -90,6 +90,13 @@ let modules = [
 ];
 
 import { AppComponent } from './app.component';
+import { ResourceComponent } from './pages/resource/resource.component';
+import { ProductComponent } from './pages/product/product.component';
+import { UserComponent } from './pages/user/user.component';
+import { MoneyComponent } from './pages/money/money.component';
+import { FansComponent } from './pages/fans/fans.component';
+import { QrComponent } from './pages/qr/qr.component';
+import { OrderComponent } from './pages/order/order.component';
 
 import { AppHeaderComponent } from './widgets/app-header';
 import { AppFooterComponent } from './widgets/app-footer';
@@ -103,6 +110,13 @@ import { BreadcrumbComponent } from './widgets/breadcrumb';
 
 let widgets = [
   AppComponent,
+  ResourceComponent,
+  ProductComponent,
+  UserComponent,
+  MoneyComponent,
+  FansComponent,
+  QrComponent,
+  OrderComponent,
   BreadcrumbComponent,
   AppHeaderComponent,
   AppFooterComponent,

@@ -5,7 +5,8 @@ export function apis(apiOrigin: string, ext?: string) {
 
         GetProfile: `${apiOrigin}/profile${ext}`,
         GetUserResources: `${apiOrigin}/resources${ext}`,
-        GetUserResource: (id: any) => `${apiOrigin}/resource/${id}${ext}`,
+        GetUserResource: (id: any) => `${apiOrigin}/resource/id/${id}${ext}`,
+        PatchResourceMount: `${apiOrigin}/resource/mount${ext}`,
         GetUserSites: `${apiOrigin}/sites${ext}`,
         GetUserSite: (id: any) => `${apiOrigin}/site/${id}${ext}`,
         PostUserSite: `${apiOrigin}/site${ext}`,
