@@ -1,17 +1,17 @@
-import { ISku } from '../product';
+import { IPackage } from '../package';
 import { ICheckoutPayload } from './order';
 
 export interface ICheckout {
-  Sku: ISku;
+  Package: IPackage;
   Quantity: number;
   Total: number;
   Remark?: string;
 }
 
 export function toPayload(checkout: ICheckout): ICheckoutPayload {
-  let {Sku, Quantity, Remark, Total} = checkout; // tslint:disable-line:variable-name
+  let { Package, Quantity, Remark, Total } = checkout; // tslint:disable-line:variable-name
   let data: ICheckoutPayload = {
-    SkuID: Sku.ID,
+    PackageID: Package.ID,
     Quantity,
     Total,
   };

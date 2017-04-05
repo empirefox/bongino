@@ -44,50 +44,92 @@ export class LayoutsAuthComponent implements OnInit {
     // define here your own links menu structure
     this.mylinks = [
       {
-        'title': 'Resource',
-        'icon': 'cubes',
-        'link': ['/resource']
+        'title': 'Package',
+        'icon': 'shopping-bag',
+        'link': ['/package']
       },
       {
-        'title': 'Product',
-        'icon': 'shopping-bag',
-        'link': ['/product']
+        'title': 'My',
+        'icon': 'tasks',
+        sublinks: [
+          {
+            'title': 'Resource',
+            'icon': 'cubes',
+            'link': ['/my/resource']
+          },
+          {
+            'title': 'Fans',
+            'icon': 'users',
+            'link': ['/my/fans']
+          },
+          {
+            'title': 'Qr',
+            'icon': 'qrcode',
+            'link': ['/my/qr']
+          },
+          {
+            'title': 'Order',
+            'icon': 'server',
+            'link': ['/my/order']
+          },
+        ]
+      },
+      {
+        'title': 'Wallet',
+        'icon': 'money',
+        sublinks: [
+          {
+            'title': 'Balance',
+            'icon': 'rmb',
+            'link': ['/wallet/balance']
+          },
+          {
+            'title': 'Reward',
+            'icon': 'credit-card-alt',
+            'link': ['/wallet/reward']
+          },
+          {
+            'title': 'Qualification',
+            'icon': 'star-half-o',
+            'link': ['/wallet/qualification']
+          },
+          {
+            'title': 'Points',
+            'icon': 'credit-card',
+            'link': ['/wallet/points']
+          },
+        ]
       },
       {
         'title': 'User',
         'icon': 'user-circle-o',
         sublinks: [
           {
+            'title': 'Head', // upload
+            'icon': 'eye',
+            'link': ['/user/head']
+          },
+          {
+            'title': 'Phone', // bind, change
+            'icon': 'mobile',
+            'link': ['/user/phone']
+          },
+          {
+            'title': 'Paykey', // set, change
+            'icon': 'key',
+            'link': ['/user/paykey']
+          },
+          {
             'title': 'User',
             'icon': 'user',
-            'link': ['/user']
-          },
-          {
-            'title': 'Money',
-            'icon': 'rmb',
-            'link': ['/money']
-          },
-          {
-            'title': 'Fans',
-            'icon': 'users',
-            'link': ['/fans']
-          },
-          {
-            'title': 'Qr',
-            'icon': 'qrcode',
-            'link': ['/qr']
-          },
-          {
-            'title': 'Order',
-            'icon': 'server',
-            'link': ['/order']
+            'link': ['/user/user']
           },
         ],
       },
       {
-        'title': 'Concact',
+        'title': 'Contact',
         'icon': 'comments-o',
-        'link': ['/concact']
+        'link': ['/contact']
       },
 
       {

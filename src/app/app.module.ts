@@ -14,13 +14,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { value as patterns } from 'ng2-ef-inputs/ng2-pattern-input/patterns';
 import {
-  Ng2AmapInputModule, AMAP_KEY,
+  Ng2AmapInputModule,
   Ng2BgInputModule,
-  Ng2FaInputModule, FA_NAMES_SRC, FaNamesSource,
-  Ng2SvgPatternInputModule, SVG_PATTERNS,
+  Ng2FaInputModule,
+  Ng2PhoneInputModule, ISmsConfig,
+  Ng2SvgPatternInputModule,
   Ng2ColorfulInputModule,
   Ng2TriangifyInputModule,
-  Ng2QiniuImageInputModule, QiniuConfig, QINIU_CONFIGS, QINIU_HTTP,
+  Ng2QiniuImageInputModule, QiniuConfig,
   Ng2SmdInputModule
 } from 'ng2-ef-inputs';
 
@@ -50,13 +51,40 @@ export function faCss2(http: Http) {
   }
 }
 
+export const smsConfig: ISmsConfig = {
+  key: 'phone_sms',
+  post: 'http://127.0.0.1:9999/echo',
+  seconds: 10,
+};
+
 export function uptokenUrl(key: string) { return `http://127.0.0.1:9999/qiniu/uptoken/${key}/1`; };
 export function listUrl(prefix: string) { return `http://127.0.0.1:9999/qiniu/${prefix}`; };
 export function deleteUrl(key: string) { return `http://127.0.0.1:9999/qiniu/${key}`; };
 export function profileUptokenUrl(key: string) { return `http://127.0.0.1:9999/qiniu/headtoken/30`; };
 
+export const qiniuConfigs: QiniuConfig[] = [
+  {
+    name: 'site',
+    bucketDomain: 'http://7xtjjx.com2.z0.glb.qiniucdn.com/',
+    thumbnailStyle: '-48x48',
+    uptokenUrl,
+    listUrl,
+    deleteUrl,
+  },
+  {
+    name: 'profile',
+    bucketDomain: 'http://7xtjjx.com2.z0.glb.qiniucdn.com/',
+    thumbnailStyle: '-48x48',
+    cacheUptoken: true,
+    uptokenUrl: profileUptokenUrl,
+    // Not used
+    // listUrl: (prefix: string) => `http://127.0.0.1:9999/qiniu/list/${prefix}`,
+    // deleteUrl: (key: string) => `http://127.0.0.1:9999/qiniu/delete/${key}`,
+  },
+];
+
 export function createTranslateLoader(http: Http) {
-  return new TranslateStaticLoader(http, '../public/assets/i18n', '.json');
+  return new TranslateStaticLoader(http, '../assets/i18n', '.json');
 }
 
 let modules = [
@@ -75,12 +103,13 @@ let modules = [
   ToasterModule,
   TreeModule,
 
-  Ng2AmapInputModule.forRoot(),
+  Ng2AmapInputModule.forRoot('d3f5d8b3b05231fa6a11375492310e3a'),
   Ng2BgInputModule,
   Ng2ColorfulInputModule.forRoot(),
-  Ng2FaInputModule.forRoot(),
-  Ng2SvgPatternInputModule.forRoot(),
-  Ng2QiniuImageInputModule.forRoot(),
+  Ng2FaInputModule.forRoot({ css: faCss1 }),
+  Ng2PhoneInputModule.forRoot(smsConfig),
+  Ng2SvgPatternInputModule.forRoot(patterns),
+  Ng2QiniuImageInputModule.forRoot(qiniuConfigs, Http),
   Ng2SmdInputModule.forRoot(),
   Ng2TriangifyInputModule.forRoot(),
 
@@ -90,13 +119,6 @@ let modules = [
 ];
 
 import { AppComponent } from './app.component';
-import { ResourceComponent } from './pages/resource/resource.component';
-import { ProductComponent } from './pages/product/product.component';
-import { UserComponent } from './pages/user/user.component';
-import { MoneyComponent } from './pages/money/money.component';
-import { FansComponent } from './pages/fans/fans.component';
-import { QrComponent } from './pages/qr/qr.component';
-import { OrderComponent } from './pages/order/order.component';
 
 import { AppHeaderComponent } from './widgets/app-header';
 import { AppFooterComponent } from './widgets/app-footer';
@@ -110,13 +132,6 @@ import { BreadcrumbComponent } from './widgets/breadcrumb';
 
 let widgets = [
   AppComponent,
-  ResourceComponent,
-  ProductComponent,
-  UserComponent,
-  MoneyComponent,
-  FansComponent,
-  QrComponent,
-  OrderComponent,
   BreadcrumbComponent,
   AppHeaderComponent,
   AppFooterComponent,
@@ -148,53 +163,18 @@ let services = [
   NotificationService,
   AdminLTETranslateService,
   LoggerService,
-
-  { provide: AMAP_KEY, useValue: 'd3f5d8b3b05231fa6a11375492310e3a' },
-  { provide: FA_NAMES_SRC, useValue: <FaNamesSource>{ css: faCss1 } },
-  { provide: SVG_PATTERNS, useValue: patterns },
-  { provide: QINIU_HTTP, useExisting: Http }, // AuthHttp
-  {
-    provide: QINIU_CONFIGS,
-    useValue: <QiniuConfig[]>[
-      {
-        name: 'site',
-        bucketDomain: 'http://7xtjjx.com2.z0.glb.qiniucdn.com/',
-        thumbnailStyle: '-48x48',
-        uptokenUrl,
-        listUrl,
-        deleteUrl,
-      },
-      {
-        name: 'profile',
-        bucketDomain: 'http://7xtjjx.com2.z0.glb.qiniucdn.com/',
-        thumbnailStyle: '-48x48',
-        cacheUptoken: true,
-        uptokenUrl: profileUptokenUrl,
-        // Not used
-        // listUrl: (prefix: string) => `http://127.0.0.1:9999/qiniu/list/${prefix}`,
-        // deleteUrl: (key: string) => `http://127.0.0.1:9999/qiniu/delete/${key}`,
-      },
-    ],
-  },
 ];
 
 // les pages
-import { HomeComponent } from './pages/home/home.component';
-import { PageNumComponent } from './pages/page-num/page-num.component';
-import { ClientComponent } from './pages/client/client.component';
 import { LayoutsAuthComponent } from './pages/layouts/auth/auth';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 
 let pages = [
-  HomeComponent,
-  PageNumComponent,
-  ClientComponent,
   LayoutsAuthComponent,
   LoginComponent,
   RegisterComponent
 ];
-import { PageComponent } from './pages/page/page.component';
 
 // main bootstrap
 import { routing } from './app.routes';
@@ -204,11 +184,10 @@ import { routing } from './app.routes';
   declarations: [
     ...widgets,
     ...pages,
-    PageComponent
   ],
   imports: [
     ...modules,
-    routing
+    routing,
   ],
   providers: [
     ...services

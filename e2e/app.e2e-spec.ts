@@ -1,10 +1,10 @@
-import { Ng2AdminLtePage } from './app.po';
+import { BonginoPage } from './app.po';
 
-describe('ng2-admin-lte App', function() {
-  let page: Ng2AdminLtePage;
+describe('bongino App', () => {
+  let page: BonginoPage;
 
   beforeEach(() => {
-    page = new Ng2AdminLtePage();
+    page = new BonginoPage();
   });
 
   it('should display message saying app works', () => {

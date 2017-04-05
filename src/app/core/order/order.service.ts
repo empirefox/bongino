@@ -3,7 +3,6 @@ import { Observable } from 'rxjs/Observable';
 import { api } from '../config';
 import { Crud, CrudService } from '../crud';
 import { IWxPayArgs, MoneyService } from '../money';
-import { IEvalItem } from '../product';
 import {
   IOrder,
   IOrderPayPayload,
@@ -35,11 +34,6 @@ export class OrderService extends Crud<IOrder> {
   changeState(order: IOrder, state: number): Observable<IOrder> {
     let payload: IOrderChangeStatePayload = { ID: order.ID, State: state };
     return this.http.post(api.PostOrderState, JSON.stringify(payload)).mergeMap(res => this.updateCache(order.ID, res.json()));
-  }
-
-  evalOrder(order: IOrder, itemEval: IEvalItem): Observable<IOrder> {
-    return this.http.post(api.PostOrderEval(order.ID), JSON.stringify(itemEval)).
-      mergeMap(res => this.updateCache(order.ID, res.json()));
   }
 
   pay(order: IOrder, key: string): Observable<IOrder> {

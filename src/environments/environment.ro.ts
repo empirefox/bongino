@@ -10,6 +10,7 @@ export const environment: EnvArgs = {
   publicOrigin: 'http://127.0.0.1:4200',
   apiOrigin: 'http://127.0.0.1:4200/fixture/api',
   apiExt: '.json',
+  siteExt: '.json',
   wxCodeEndpoint: 'https://open.weixin.qq.com/connect/oauth2/authorize',
   qiniuUphost: 'https://up.qbox.me',
   cdnImgOrigin: 'http://head.luck2.com',

@@ -2,43 +2,33 @@ import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { CanActivateGuard } from './services/guard.service';
 
-// Components
-import { HomeComponent } from './pages/home/home.component';
-import { PageNumComponent } from './pages/page-num/page-num.component';
-import { ClientComponent } from './pages/client/client.component';
 import { LayoutsAuthComponent } from './pages/layouts/auth/auth';
+import { RootModule } from './pages/root/root.module';
+import { MyModule } from './pages/my/my.module';
+import { WalletModule } from './pages/wallet/wallet.module';
+import { UserModule } from './pages/user/user.module';
+
+// Components
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
-import { PageComponent } from './pages/page/page.component';
 
-const routes: Routes = [
+export function loadWalletModule() { return WalletModule; }
+export function loadUserModule() { return UserModule; }
+export function loadMyModule() { return MyModule; }
+export function loadRootModule() { return RootModule; }
+
+export const routes: Routes = [
   // logged routes
   {
     canActivate: [CanActivateGuard],
-    children: [
-      {
-        canActivate: [CanActivateGuard],
-        component: HomeComponent,
-        path: 'home'
-      },
-      {
-        canActivate: [CanActivateGuard],
-        component: PageNumComponent,
-        path: 'page/:id'
-      },
-      {
-        canActivate: [CanActivateGuard],
-        component: ClientComponent,
-        path: 'client'
-      },
-      {
-        canActivate: [CanActivateGuard],
-        component: PageComponent,
-        path: 'p'
-      }
-    ],
     component: LayoutsAuthComponent,
     path: '',
+    children: [
+      { path: 'wallet', loadChildren: loadWalletModule },
+      { path: 'user', loadChildren: loadUserModule },
+      { path: 'my', loadChildren: loadMyModule },
+      { path: '', loadChildren: loadRootModule },
+    ]
   },
   // not logged routes
   {

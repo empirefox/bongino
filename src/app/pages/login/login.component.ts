@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
     if ( 1 === 1 ) {
 
       let user1 = new User( {
-          avatarUrl: 'public/assets/img/user2-160x160.jpg',
+          avatarUrl: 'assets/img/user2-160x160.jpg',
           email: 'weber.antoine.pro@gmail.com',
           firstname: 'WEBER',
           lastname: 'Antoine'

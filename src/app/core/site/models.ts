@@ -16,6 +16,8 @@ import {
   sectionPatternSchemas,
 } from 'bongin-base/schema';
 
+import { config } from '../config';
+
 const { hash } = require('spark-md5');
 const sortKeys = require('sort-keys');
 
@@ -63,9 +65,9 @@ export class SiteTree implements Tree {
     this._data = data;
   }
 
-  key() { return this.hash ? `s/${this.site.ID}/f/${this.hash}` : ''; }
+  key() { return this.hash ? `s/${this.site.ID}/f/${this.hash}${config.siteExt}` : ''; }
 
-  rekey() { return this.rehash ? `s/${this.site.ID}/f/${this.rehash}` : ''; }
+  rekey() { return this.rehash ? `s/${this.site.ID}/f/${this.rehash}${config.siteExt}` : ''; }
 }
 
 export class ProfileTree implements Tree {
@@ -119,9 +121,9 @@ export class PageTree implements Tree {
   get name() { return this.nav.name; }
   get site() { return this.siteTree.site; }
 
-  key() { return this.hash ? `s/${this.site.ID}/f/${this.hash}` : ''; }
+  key() { return this.hash ? `s/${this.site.ID}/p/${this.hash}${config.siteExt}` : ''; }
 
-  rekey() { return this.rehash ? `s/${this.site.ID}/f/${this.rehash}` : ''; }
+  rekey() { return this.rehash ? `s/${this.site.ID}/p/${this.rehash}${config.siteExt}` : ''; }
 }
 
 export class NavitemTree implements Tree {

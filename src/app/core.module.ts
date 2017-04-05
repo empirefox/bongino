@@ -7,13 +7,11 @@ import { ModalModule } from 'angular2-modal';
 import { BootstrapModalModule } from 'angular2-modal/plugins/bootstrap';
 import { RatingModule } from 'ngx-rating';
 
-import { APP_CORE_PIPES } from './core';
 import { APP_DIRECTIVES } from './directives';
 
 // TODO add components
 @NgModule({
   declarations: [
-    ...APP_CORE_PIPES,
     ...APP_DIRECTIVES,
   ],
   imports: [
@@ -32,7 +30,6 @@ import { APP_DIRECTIVES } from './directives';
     HttpModule,
     BootstrapModalModule,
     RatingModule,
-    ...APP_CORE_PIPES,
     ...APP_DIRECTIVES,
   ],
 })

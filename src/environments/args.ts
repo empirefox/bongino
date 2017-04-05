@@ -11,6 +11,7 @@ export interface EnvArgs {
   publicOrigin: string;
   apiOrigin: string;
   apiExt?: string;
+  siteExt?: string;
   wxCodeEndpoint: string;
   qiniuUphost: string;
   cdnImgOrigin: string;

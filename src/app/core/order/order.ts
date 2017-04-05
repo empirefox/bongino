@@ -1,7 +1,6 @@
-import { ISku, IEvalItem } from '../product';
 import { IWxPayArgs } from '../money';
 
-export interface IOrder extends IEvalItem {
+export interface IOrder {
   ID: number;
   Remark: string;
 
@@ -38,7 +37,7 @@ export interface IOrder extends IEvalItem {
 }
 
 export interface ICheckoutPayload {
-  SkuID: number;
+  PackageID: number;
   Quantity: number;
   Total: number;
   Remark?: string;

@@ -11,7 +11,7 @@ import {
   IPage,
 } from 'bongin-base';
 
-import { api } from '../config';
+import { api, config } from '../config';
 import { Crud, CrudService } from '../crud';
 import { ModalService } from '../modal';
 import {
@@ -65,7 +65,7 @@ export class SiteService extends Crud<ISite> {
   }
 
   loadSite(root: SiteTree): Promise<Tree[]> {
-    let sm = new SiteMethods(root.data);
+    let sm = new SiteMethods(root.data, config.siteExt);
     return this.rawHttp.get(sm.profile()).map(res => res.json()).catch((err, caught) => {
       return caught.map(res => {
         if (res.status !== 404) {
@@ -103,7 +103,7 @@ export class SiteService extends Crud<ISite> {
   }
 
   loadPage(pageTree: PageTree): Promise<Tree[]> {
-    let sm = new SiteMethods(pageTree.siteTree.data);
+    let sm = new SiteMethods(pageTree.siteTree.data, config.siteExt);
     return this.rawHttp.get(sm.page(pageTree.nav)).map(res => parsePageChildren(pageTree, res.json(), pageTree.nav)).toPromise();
   }
 
