@@ -7,17 +7,17 @@ import { IPackage } from './package';
 @Injectable()
 export class PackageService {
 
-  private products: Observable<IPackage[]> = null;
+  private packages: Observable<IPackage[]> = null;
 
   constructor(private http: Http) { }
 
-  clearCache() { this.products = null; }
+  clearCache() { this.packages = null; }
 
-  getPackages(): Observable<IPackage[]> {
-    if (!this.products) {
-      this.products = this.http.get(api.GetProducts).map(res => res.json() || []).publishReplay(1).refCount();
+  getItems(): Observable<IPackage[]> {
+    if (!this.packages) {
+      this.packages = this.http.get(api.GetPackages).map(res => res.json() || []).publishReplay(1).refCount();
     }
-    return this.products;
+    return this.packages;
   }
 
 }

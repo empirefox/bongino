@@ -13,8 +13,8 @@ export class OrderResolver implements Resolve<IOrder> {
     private orderService: OrderService) { }
 
   resolve(route: ActivatedRouteSnapshot): Observable<IOrder | boolean> {
-    let id = +route.params['id'];
-    return this.orderService.getOrder(id).map(order => {
+    const id = +route.params['id'];
+    return this.orderService.getOrder(id).take(1).map(order => {
       if (!order) {
         this.router.navigateByUrl('/order');
       }

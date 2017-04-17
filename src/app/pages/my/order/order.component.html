@@ -1,3 +1,5 @@
-<p>
-  order works!
-</p>
+<ngx-datatable *ngIf="items" [rows]="items" [columns]="columns" [rowHeight]="'auto'"></ngx-datatable>
+
+<ng-template #actionTmpl let-row="row">
+  <order-actions [order]="row" (payChange)="onPayChange($event)" (stateChange)="onStateChanged()"></order-actions>
+</ng-template>

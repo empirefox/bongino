@@ -1,6 +1,7 @@
 {
   "src": [
-    "./src/**/user/user.ts"
+    "./src/app/core/user/user.ts",
+    "./src/app/core/order/order.ts"
   ],
   "dist": "./src/app/core/api/trans.ts",
   "tag": "tr",

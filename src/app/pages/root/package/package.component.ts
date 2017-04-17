@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IPackage, PackageService } from '../../../core';
 
 @Component({
@@ -14,11 +14,12 @@ export class PackageComponent implements OnInit {
   items: IPackage[];
 
   constructor(
-    private router: Router,
-    private packageService: PackageService, ) { }
+    private route: ActivatedRoute,
+    private router: Router) { }
 
   ngOnInit() {
-    this.packageService.getPackages().subscribe(items => this.items = items);
+    const data = <{ packages: IPackage[] }>this.route.snapshot.data;
+    this.items = data.packages;
   }
 
   gotoBuy(item: IPackage, num: number) {

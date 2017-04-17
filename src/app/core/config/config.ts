@@ -21,6 +21,7 @@ export interface IProfile {
   FreeDeliverLine: number;
 
   HeadPrefix: string;
+  QrLogoUrl: string;
 }
 
 export const config = Object.assign({
@@ -32,3 +33,27 @@ export const config = Object.assign({
 }, environment);
 
 export const api = apis(environment.apiOrigin, environment.apiExt);
+
+export interface QrConfig {
+  TypeNumber: number;
+  CellSize: number;
+  ColorFore: string;
+  ColorBack: string;
+  ColorOut: string;
+  ColorIn: string;
+  LogoSize: number;
+  LogoClearEdges: number;
+  LogoMargin: number;
+}
+
+export const qrConfig: QrConfig = {
+  TypeNumber: 1,
+  CellSize: 6,
+  ColorFore: '#222',
+  ColorBack: '#fff',
+  ColorOut: '#222',
+  ColorIn: '#222',
+  LogoSize: 15,
+  LogoClearEdges: 2,
+  LogoMargin: 0,
+};

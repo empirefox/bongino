@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-qr',
@@ -6,10 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./qr.component.css']
 })
 export class QrComponent implements OnInit {
+  qr: string;
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
+    const data = <{ qr: string }>this.route.snapshot.data;
+    this.qr = data.qr;
   }
 
 }

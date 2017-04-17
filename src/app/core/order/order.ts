@@ -2,24 +2,22 @@ import { IWxPayArgs } from '../money';
 
 export interface IOrder {
   ID: number;
-  Remark: string;
+/**@tr zh:"备注"*/ Remark: string;
 
-  ProductID: number;
-  SkuID: number;
-  Quantity: number;
-  Price: number;
-  Name: string;
-  Img: string;
-  Attrs: string;
+  PackageID: number;
+/**@tr zh:"单位"*/ Unit: string;
+/**@tr zh:"数量"*/ Quantity: number;
+/**@tr zh:"单价"*/ Price: number;
+/**@tr zh:"名称"*/ Name: string;
 
-  PayAmount: number;
+/**@tr zh:"金额"*/ PayAmount: number;
   WxPaid: number;
   WxRefund: number;
   CashPaid: number;
   CashRefund: number;
   RefundReason: string;
 
-  State: number;
+/**@tr zh:"状态"*/ State: number;
   CreatedAt: number;
   CanceledAt: number;
   PrepaidAt: number;

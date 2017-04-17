@@ -1,3 +1,7 @@
-<p>
-  fans works!
-</p>
+<ul class="list-group">
+  <li *ngFor="let item of items" class="list-group-item">
+    <img [defaultImage]="config.DefaultHeadImage" [lazyLoad]="item.HeadImageURL">
+    <div>{{item.Nickname}}</div>
+    <span class="badge">{{item.CreatedAt | ago}}</span>
+  </li>
+</ul>

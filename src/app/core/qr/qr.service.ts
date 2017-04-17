@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as qrcanvas from 'qrcanvas';
 
+import { ConfigService, qrConfig } from '../config';
 import { UserService } from '../user';
-import { QrConfig } from './qr.config';
 
 
 @Injectable()
@@ -11,21 +11,22 @@ export class QrService {
 
   private qr: Observable<string>;
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private configService: ConfigService) { }
 
   getMyQrDataURL(): Observable<string> {
     if (!this.qr) {
       this.qr = this.userService.getUserinfo().take(1).map(info => {
-        let config: any = this.getConfig();
-        let { ColorOut: colorOut, ColorIn: colorIn} = config;
-        let timestamp = Math.floor(Date.now() / 1000).toString(36)
+        const { ColorOut: colorOut, ColorIn: colorIn } = qrConfig;
+        const timestamp = Math.floor(Date.now() / 1000).toString(36);
 
-        let options: any = {
+        const options: any = {
           data: `${location.protocol}//${location.host}?u=${info.ID}&t=${timestamp}`, // TODO move to profile
-          cellSize: config.CellSize,
+          cellSize: qrConfig.CellSize,
           foreground: [
             // foreground color
-            { style: config.ColorFore },
+            { style: qrConfig.ColorFore },
             // outer squares of the positioner
             { row: 0, rows: 7, col: 0, cols: 7, style: colorOut },
             { row: -7, rows: 7, col: 0, cols: 7, style: colorOut },
@@ -35,37 +36,23 @@ export class QrService {
             { row: -5, rows: 3, col: 2, cols: 3, style: colorIn },
             { row: 2, rows: 3, col: -5, cols: 3, style: colorIn },
           ],
-          background: config.ColorBack,
-          typeNumber: config.TypeNumber,
+          background: qrConfig.ColorBack,
+          typeNumber: qrConfig.TypeNumber,
         };
-        if (config.QrLogoUrl) {
-          let image = new Image();
-          image.src = config.QrLogoUrl;
+        if (this.configService.config.QrLogoUrl) {
+          const image = new Image();
+          image.src = this.configService.config.QrLogoUrl;
           options.logo = {
             image,
-            size: config.LogoSize,
-            clearEdges: config.LogoClearEdges,
-            margin: config.LogoMargin,
+            size: qrConfig.LogoSize,
+            clearEdges: qrConfig.LogoClearEdges,
+            margin: qrConfig.LogoMargin,
           };
         }
         return qrcanvas(options).toDataURL();
       });
     }
     return this.qr;
-  }
-
-  getConfig(): QrConfig {
-    return {
-      TypeNumber: 1,
-      CellSize: 6,
-      ColorFore: '#222',
-      ColorBack: '#fff',
-      ColorOut: '#222',
-      ColorIn: '#222',
-      LogoSize: 15,
-      LogoClearEdges: 2,
-      LogoMargin: 0,
-    };
   }
 
 }
